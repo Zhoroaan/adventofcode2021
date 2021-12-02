@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AdventOfCode2021", "Day01\Day01.vcxproj", "{44590255-BA00-4482-A6D7-EA702E68BE0E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Day02", "Day02\Day02.vcxproj", "{48610306-3B5C-4A8B-B285-9474AC23247D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -18,5 +20,13 @@ Global
 		{44590255-BA00-4482-A6D7-EA702E68BE0E}.Release|Win32.Build.0 = Release|Win32
 		{44590255-BA00-4482-A6D7-EA702E68BE0E}.Release|x64.ActiveCfg = Release|x64
 		{44590255-BA00-4482-A6D7-EA702E68BE0E}.Release|x64.Build.0 = Release|x64
+		{48610306-3B5C-4A8B-B285-9474AC23247D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{48610306-3B5C-4A8B-B285-9474AC23247D}.Debug|Win32.Build.0 = Debug|Win32
+		{48610306-3B5C-4A8B-B285-9474AC23247D}.Debug|x64.ActiveCfg = Debug|x64
+		{48610306-3B5C-4A8B-B285-9474AC23247D}.Debug|x64.Build.0 = Debug|x64
+		{48610306-3B5C-4A8B-B285-9474AC23247D}.Release|Win32.ActiveCfg = Release|Win32
+		{48610306-3B5C-4A8B-B285-9474AC23247D}.Release|Win32.Build.0 = Release|Win32
+		{48610306-3B5C-4A8B-B285-9474AC23247D}.Release|x64.ActiveCfg = Release|x64
+		{48610306-3B5C-4A8B-B285-9474AC23247D}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 EndGlobal
