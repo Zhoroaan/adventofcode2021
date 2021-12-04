@@ -166,13 +166,18 @@ int main(int argc, char* argv[])
 
     for (int32_t numberToDraw : numbersToDraw)
     {
-        for (auto board : bingoBoards)
+        if (bingoBoards.size() > 1)
         {
-            if (board->DrawNumber(numberToDraw))
-            {
-                board->CalculateAndShowAnswer(numberToDraw);
-                return 0;
-            }
+            std::erase_if(bingoBoards, [numberToDraw](std::shared_ptr<BingoBoard> InBingoBoard)
+           {
+               return InBingoBoard->DrawNumber(numberToDraw);
+           });
+        }
+       
+        if (bingoBoards.size() == 1 && bingoBoards[0]->DrawNumber(numberToDraw))
+        {
+            bingoBoards[0]->CalculateAndShowAnswer(numberToDraw);
+            return 0;
         }
     }
 
