@@ -5,8 +5,8 @@
 
 #include "../Lib/CommonLib.h"
 
-// const char* InputData = "TestInputData.txt";
-const char* InputData = "MyInput.txt";
+const char* InputData = "TestInputData.txt";
+//const char* InputData = "MyInput.txt";
 
 class Diagram
 {
@@ -40,15 +40,24 @@ public:
 
     void AddLine(int InX1, int InY1, int InX2, int InY2)
     {
-        const bool isHorizontal = InX1 != InX2;
-        const bool isDiagonal = isHorizontal && InY1 != InY2;
-        if (isDiagonal)
-            return;
         GrowToFitX(InX1);
         GrowToFitY(InY1);
         GrowToFitX(InX2);
         GrowToFitY(InY2);
-        if (isHorizontal)
+        const bool isDiagonal = InX1 != InX2 && InY1 != InY2;
+        const bool isHorizontal = !isDiagonal &&  InX1 != InX2;
+        if (isDiagonal)
+        {
+            int minX = std::min(InX1, InX2);
+            int startY = minX == InX1 ? InY1 : InY2;
+            int incrementYValue = (startY == InY1 ? InY1 < InY2 : InY2 < InY1) ? 1 : -1;
+            int maxX = std::max(InX1, InX2);
+            for (int x = minX, y = startY; x <= maxX; ++x, y+=incrementYValue)
+            {
+                Board[y][x]++; // Y will remain the same
+            }
+        }
+        else if (isHorizontal)
         {
             int maxX = std::max(InX1, InX2);
             for (int x = std::min(InX1, InX2); x <= maxX; ++x)
