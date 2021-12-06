@@ -1,3 +1,4 @@
+#include <array>
 #include <iostream>
 #include <fstream>
 
@@ -19,37 +20,34 @@ int main(int argc, char* argv[])
         return 1;
     }
 
+    std::array<uint64_t, 9> fishBuckets = {0};
     std::string buffer;
-    std::vector<uint8_t> fishDb;
-    fishDb.reserve(10000);
+    
     while (std::getline(inputDataStream, buffer, ','))
     {
-        fishDb.push_back(std::atoi(buffer.c_str()));
+        const int currentBucket = std::atoi(buffer.c_str());
+        fishBuckets[currentBucket]++;
     }
 
-    constexpr int GenerationCount = 80;
+    constexpr int GenerationCount = 256;
     for (int generation = 0; generation < GenerationCount; ++generation)
     {
-        const size_t startFishCount = fishDb.size();
-        for (int fishIndex = 0; fishIndex < startFishCount; ++fishIndex)
+        const uint64_t countToAdd = fishBuckets[0];
+        for (int bucketCount = 1; bucketCount < 9; ++bucketCount)
         {
-            if (fishDb[fishIndex] == 0)
-            {
-                fishDb[fishIndex] = 6;
-                fishDb.push_back(8);
-            }
-            else
-                fishDb[fishIndex]--;
+            fishBuckets[bucketCount -1] = fishBuckets[bucketCount];
         }
-        // std::cout << "After " << generation + 1 << "days: ";
-        // for (auto fish : fishDb)
-        // {
-        //     std::cout << static_cast<int>(fish) << ',';
-        // }
-        // std::cout << std::endl;
+        fishBuckets[6] += countToAdd;
+        fishBuckets[8] = countToAdd;
     }
 
-    std::cout << "Number of fish: " << fishDb.size() << std::endl;
+    uint64_t totalFishCount = 0;
+    for (const auto fishCount : fishBuckets)
+    {
+        totalFishCount += fishCount;
+    }
+
+    std::cout << "Number of fish: " << totalFishCount << std::endl;
     
     return 0;
 }
