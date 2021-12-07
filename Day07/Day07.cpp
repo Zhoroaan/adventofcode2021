@@ -6,8 +6,17 @@
 
 #include "../Lib/CommonLib.h"
 
-//const char* InputData = "TestInputData.txt";
-const char* InputData = "MyInput.txt";
+const char* InputData = "TestInputData.txt";
+// const char* InputData = "MyInput.txt";
+
+inline uint64_t CalculateCost(int InStepCount)
+{
+    uint64_t totalCost = 0;
+    for (int step = 1; step <= InStepCount; step++)
+        totalCost += step;
+    
+    return totalCost;
+}
 
 int main(int argc, char* argv[])
 {
@@ -32,7 +41,7 @@ int main(int argc, char* argv[])
 
     std::sort(crabStartPositions.begin(), crabStartPositions.end());
 
-    const uint32_t maxNumber = *(crabStartPositions.end() - 1);
+    const int32_t maxNumber = *(crabStartPositions.end() - 1);
     uint64_t minCost = std::numeric_limits<uint64_t>::max();
     int32_t bestPosition = std::numeric_limits<int32_t>::min();;
     for (int32_t x = crabStartPositions[0]; x <= maxNumber; ++x)
@@ -40,7 +49,7 @@ int main(int argc, char* argv[])
         uint64_t count = 0;
         for (const int32_t crabStartPosition : crabStartPositions)
         {
-            count += std::abs(crabStartPosition - x);
+            count += CalculateCost(std::abs(crabStartPosition - x));
         }
         if (count < minCost)
         {
