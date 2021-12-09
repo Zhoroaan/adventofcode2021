@@ -1,12 +1,58 @@
 #include <iostream>
 #include <fstream>
-#include <stdbool.h>
 #include <string>
+#include <unordered_map>
 
 #include "../Lib/CommonLib.h"
 
 //const char* InputData = "TestInputData.txt";
 const char* InputData = "MyInput.txt";
+
+struct PointInfo
+{
+    PointInfo ()
+        : PointX(0), PointY(0), Height(0)
+    {}
+    PointInfo(uint8_t InPointX, uint8_t InPointY, uint32_t InHeight)
+    : PointX(InPointX), PointY(InPointY), Height(InHeight)
+    { }
+    uint8_t PointX;
+    uint8_t PointY;
+    uint32_t Height;
+
+    uint16_t GetHash() const
+    {
+        return PointY << 8 | PointX;
+    }
+};
+
+using BasinMap = std::unordered_map<uint16_t, PointInfo>;
+
+void CreateBasin(
+    const std::vector<std::vector<uint8_t>>& InHeights,
+    int InColumn, int InRow, size_t InXSize, size_t InYSize,
+    BasinMap& InOutCurrentBasin)
+{
+    if (InRow < 0 || InRow >= InYSize)
+        return;
+
+    if (InColumn < 0 || InColumn >= InXSize)
+        return;
+
+    const uint8_t currentHeight = InHeights[InRow][InColumn];
+    if (currentHeight == 9)
+        return;
+
+    const PointInfo newPoint(InColumn, InRow, currentHeight);
+    if (InOutCurrentBasin.contains(newPoint.GetHash()))
+        return;
+
+    InOutCurrentBasin[newPoint.GetHash()] = newPoint;
+    CreateBasin(InHeights, InColumn, InRow - 1, InXSize, InYSize, InOutCurrentBasin); // Up
+    CreateBasin(InHeights, InColumn, InRow + 1, InXSize, InYSize, InOutCurrentBasin); // Down
+    CreateBasin(InHeights, InColumn - 1, InRow, InXSize, InYSize, InOutCurrentBasin); // Left
+    CreateBasin(InHeights, InColumn + 1, InRow, InXSize, InYSize, InOutCurrentBasin); // Right
+}
 
 int main(int argc, char* argv[])
 {
@@ -38,7 +84,7 @@ int main(int argc, char* argv[])
     }
     const auto xSize = heights[0].size();
     const auto ySize = heights.size();
-    int32_t totalRisk = 0;
+    std::vector<BasinMap> basinHeights;
     for (int row = 0; row < heights.size(); ++row)
     {
         for (int column = 0; column < xSize; ++column)
@@ -51,12 +97,19 @@ int main(int argc, char* argv[])
             smallest &= column == xSize - 1 || heights[row][column+ 1 ] > currentHeight; // Right
             if (smallest)
             {
-                totalRisk += currentHeight + 1;
+                BasinMap currentBasinPoints;
+                CreateBasin(heights, column, row, xSize, ySize, currentBasinPoints);
+                basinHeights.push_back(std::move(currentBasinPoints));
                 //std::cout << "Smallest found: (" << column << ", " << row << ") height: " << currentHeight << std::endl;
             }
         }
     }
-    std::cout << "Total risk level: " << totalRisk << std::endl;
+
+    std::ranges::sort(basinHeights, [](const BasinMap& InBasinA, const BasinMap& InBasinB) {
+        return InBasinA.size() > InBasinB.size();
+    });
+
+    std::cout << "Multiplied size " << basinHeights[0].size() * basinHeights[1].size() * basinHeights[2].size() << std::endl;
     
     return 0;
 }
