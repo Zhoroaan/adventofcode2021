@@ -10,10 +10,12 @@
 const char* InputData = "MyInput.txt";
 
 
-int32_t CalculateScoreOfLine(const std::string& InBuffer, std::unordered_map<char, std::pair<char, int32_t>>& InTags)
+int64_t CalculateScoreOfLine(const std::string& InBuffer, std::unordered_map<char, std::pair<char, int32_t>>& InTags)
 {
     std::stack<char> stack;
     stack.push(InBuffer[0]);
+
+    int64_t score = 0;
 
     for (int charIndex = 1; charIndex < InBuffer.length(); ++charIndex)
     {
@@ -32,14 +34,30 @@ int32_t CalculateScoreOfLine(const std::string& InBuffer, std::unordered_map<cha
         case '}':
         case '>':
             {
-                if (stack.top() != InTags[InBuffer[charIndex]].first)
-                    return InTags[InBuffer[charIndex]].second;
+                if (stack.top() != InTags[InBuffer[charIndex]].first) // This is an invalid line
+                    return 0;
                 stack.pop();
                 break;
             }
         }
     }
-    return 0;
+
+    while (!stack.empty())
+    {
+        auto firstMatch = std::ranges::find_if(InTags, [character = stack.top()](const std::pair<char, std::pair<char, int32_t>>& InElement)
+        {
+            return InElement.second.first == character;
+        });
+        if (firstMatch == InTags.end())
+            continue;
+        //std::cout << firstMatch->first;
+        int32_t pointForChar = firstMatch->second.second;
+        score = (score * 5) + pointForChar;
+        stack.pop();
+    }
+    //std::cout << " - " << score << " total points." << std::endl;
+    
+    return score;
 }
 
 int main(int argc, char* argv[])
@@ -57,16 +75,20 @@ int main(int argc, char* argv[])
 
     std::string buffer;
     std::unordered_map<char, std::pair<char, int32_t>> matchingCloseTags;
-    matchingCloseTags[')'] = std::pair('(', 3);
-    matchingCloseTags[']'] = std::pair('[', 57);
-    matchingCloseTags['}'] = std::pair('{', 1197);
-    matchingCloseTags['>'] = std::pair('<', 25137);
+    matchingCloseTags[')'] = std::pair('(', 1);
+    matchingCloseTags[']'] = std::pair('[', 2);
+    matchingCloseTags['}'] = std::pair('{', 3);
+    matchingCloseTags['>'] = std::pair('<', 4);
 
-    int32_t score = 0;
+    std::vector<int64_t> scores;
     while (std::getline(inputDataStream, buffer))
     {
-        score += CalculateScoreOfLine(buffer, matchingCloseTags);
+        const int64_t score = CalculateScoreOfLine(buffer, matchingCloseTags);
+        // A score of 0 is an invalid line
+        if (score != 0)
+            scores.push_back(score);
     }
-    std::cout << "Score: " << score << std::endl;
+    std::ranges::sort(scores);
+    std::cout << "Middle score: " << scores[scores.size() / 2] << std::endl;
     return 0;
 }
