@@ -4,8 +4,8 @@
 
 #include "../Lib/CommonLib.h"
 
-const char* InputData = "TestInputData.txt";
-//const char* InputData = "MyInput.txt";
+//const char* InputData = "TestInputData.txt";
+const char* InputData = "MyInput.txt";
 
 void TryFlashOcto(std::vector<std::vector<int32_t>>& InOctoEnergyLevels, const int InX, const int InY, int32_t& InOutFlashCount)
 {
@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
         octopusEnergyLevels.push_back(std::move(rowData));
     }
 
-    const int32_t genCount = 100;
+    constexpr int32_t genCount = 1000;
     int32_t totalFlashCount = 0;
     for (int32_t gen = 0; gen < genCount; ++gen)
     {
@@ -100,8 +100,19 @@ int main(int argc, char* argv[])
                 std::cout << octoEnergyLevel;
             std::cout << std::endl;
         }*/
+        bool allSet = true;
+        for (const std::vector<int32_t>& row : octopusEnergyLevels)
+        {
+            for (const int32_t& octoEnergyLevel : row)
+                allSet &= octoEnergyLevel == 0;
+        }
+        if (allSet)
+        {
+            std::cout << "They all flash during generation: " << gen + 1 << std::endl;
+            return 0;
+        }
     }
-    std::cout << "Total flash count: " << totalFlashCount << std::endl;
+    std::cerr << "No syncs detected in timespan" << std::endl;
     
-    return 0;
+    return 1;
 }
