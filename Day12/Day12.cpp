@@ -10,7 +10,7 @@ using CaveConnectionList =  std::unordered_map<std::string, std::vector<std::str
 const char* InputData = "TestInputData.txt";
 // const char* InputData = "MyInput.txt";
 
-bool IsAllUppercase(std::string& InsString)
+bool IsAllUppercase(const std::string& InsString)
 {
     for (const char element : InsString)
     {
@@ -20,9 +20,47 @@ bool IsAllUppercase(std::string& InsString)
     return true;
 }
 
+bool IsMultiConnectPossible(std::vector<std::string> InCurrentPath, std::string InConnectingNode)
+{
+    if (IsAllUppercase(InConnectingNode))
+        return true;
+
+    if (InConnectingNode == "start")
+        return false;
+
+    std::unordered_map<std::string, int32_t> smallNodeCount;
+    for (const std::string& node : InCurrentPath)
+    {
+        if (node == "start")
+            continue;
+        if (IsAllUppercase(node))
+            continue;
+
+        if (smallNodeCount.find(node) == smallNodeCount.end())
+            smallNodeCount[node] = 1;
+        else
+            smallNodeCount[node]++;
+    }
+
+    if (smallNodeCount.find(InConnectingNode) == smallNodeCount.end())
+        smallNodeCount[InConnectingNode] = 1;
+    else
+        smallNodeCount[InConnectingNode]++;
+
+    int smallCaveCount = 0;
+    for (const auto& smallCave : smallNodeCount)
+    {
+        if (smallCave.second > 2)
+            return false;
+        if (smallCave.second == 2)
+            smallCaveCount++;
+    }
+    return smallCaveCount < 2;
+}
+
 int32_t CalcNumberOfFoundPaths(const CaveConnectionList& InCaveConnections, std::vector<std::string> InCurrentPath)
 {
-    if (InCurrentPath.size() > 100)
+    if (InCurrentPath.size() > 10000)
         return 0;
     
     std::string currentNode = InCurrentPath.back();
@@ -33,12 +71,12 @@ int32_t CalcNumberOfFoundPaths(const CaveConnectionList& InCaveConnections, std:
     {
         if (connectingNode == "end")
         {
-            isDone = true;
+           isDone = true;
            continue;
         }
         
         const bool nodeVisitedBefore = std::ranges::find(InCurrentPath, connectingNode) != InCurrentPath.end();
-        const bool nodeMultiVisit = IsAllUppercase(connectingNode);
+        const bool nodeMultiVisit = IsMultiConnectPossible(InCurrentPath, connectingNode);
         if (nodeVisitedBefore && !nodeMultiVisit)
             continue;
 
